@@ -20,6 +20,7 @@ public class Config {
     private boolean onlyRegister;
     private boolean disableConnectionPool;
     private boolean verifyPasswords;
+    private boolean readPSKCredentials;
 
     public void setNamespace(String namespace) {
         this.namespace = namespace;
@@ -101,6 +102,14 @@ public class Config {
         return verifyPasswords;
     }
 
+    public boolean isReadPSKCredentials() {
+        return readPSKCredentials;
+    }
+
+    public void setReadPSKCredentials(boolean readPSKCredentials) {
+        this.readPSKCredentials = readPSKCredentials;
+    }
+
     public static Config fromEnv() throws IOException {
         final Config result = new Config();
 
@@ -139,6 +148,7 @@ public class Config {
                     return builder.build();
                 }));
 
+        Environment.consumeAs("TEST_PSK", Boolean::parseBoolean, result::setReadPSKCredentials);
         Environment.consumeAs("INSECURE_TLS", Boolean::parseBoolean, result::setInsecureTls);
         Environment.consumeAs("ONLY_REGISTER", Boolean::parseBoolean, result::setOnlyRegister);
         Environment.consumeAs("DISABLE_CONNECTION_POOL", Boolean::parseBoolean, result::setDisableConnectionPool);

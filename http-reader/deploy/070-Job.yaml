@@ -23,9 +23,9 @@ spec:
             - name: IOT_PROJECT
               value: iot
             - name: MAX_DEVICES_CREATED
-              value: "2000"
+              value: "400000"
             - name: DEVICES_TO_READ
-              value: "-1"
+              value: "1000000"
             - name: NAMESPACE
               valueFrom:
                 fieldRef:
@@ -35,7 +35,9 @@ spec:
             - name: INSECURE_TLS
               value: "true"
             - name: VERIFY_PASSWORDS
-              value: "true"
+              value: "false"
+            - name: TEST_PSK
+              value: "false"
           ports:
             - name: metrics
               containerPort: 8081

@@ -38,6 +38,8 @@ public class Reader implements AutoCloseable {
     private HttpUrl registrationUrl;
     private HttpUrl credentialsUrl;
 
+    private boolean psk = false;
+
     private final Gauge possibleDeviceRange =
             Gauge.build()
                     .name("read_device_range")
@@ -80,7 +82,6 @@ public class Reader implements AutoCloseable {
                 .addPathSegment("debug")
                 .addPathSegment("credentials")
                 .addPathSegment(config.getTenantId())
-                .addPathSegment("hashed-password")
                 .build();
 
         System.out.println("Registration URL: " + this.registrationUrl);
@@ -130,21 +131,23 @@ public class Reader implements AutoCloseable {
 
         final Instant endReg = Instant.now();
         if (!config.isOnlyRegister()) {
-            final String authId = prefix + "auth-" + Long.toString(i);
+            final Request credentials;
+            if (psk && this.config.isReadPSKCredentials()) {
 
-            final Request credentials = new Request.Builder()
-                    .url(this.credentialsUrl
-                            .newBuilder()
-                            .addPathSegment(authId)
-                            .build())
-                    .get()
-                    .build();
+                final String authId = deviceId + "_authId-2";
+                credentials = getCredentialRequest("psk", authId);
+
+            } else {
+                final String authId = deviceId + "_authId-1";
+                credentials = getCredentialRequest("hashed-password", authId);
+            }
 
             try (Response response = this.client.newCall(credentials).execute()) {
                 if (!response.isSuccessful()) {
                     handleCredentialsFailure(response);
                     return;
                 }
+            psk = !psk;
 
                 if (config.isVerifyPasswords()) {
                     // verify the credential
@@ -211,5 +214,16 @@ public class Reader implements AutoCloseable {
         final String expectedHash = encodePassword(salt, expectedPassword);
 
         return hash.equals(expectedHash);
+    }
+
+    private Request getCredentialRequest(final String type, final String authId){
+        return new Request.Builder()
+                .url(this.credentialsUrl
+                        .newBuilder()
+                        .addPathSegment(type)
+                        .addPathSegment(authId)
+                        .build())
+                .get()
+                .build();
     }
 }

@@ -1,19 +1,11 @@
 package net.trystram.scaletest.httpInserter;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.Random;
 
+import net.trystram.scaletest.AbstractInserter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,26 +21,21 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class Creater implements AutoCloseable {
+public class Creater extends AbstractInserter implements AutoCloseable {
 
-    private static final Logger log = LoggerFactory.getLogger(Creater.class);
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    /**
-     * The RNG for the salt. As this is just for testing, we don't need to use {@link SecureRandom}.
-     */
-    private static final Random R = new Random();
+    private Logger log = LoggerFactory.getLogger(Creater.class);
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final Config config;
-    private final boolean plain;
-    private final boolean dynamic;
+
     private final Statistics stats;
-    private final String registrationBody;
-    private final int credentialExtSize;
 
     private OkHttpClient client;
     private HttpUrl registerUrl;
     private HttpUrl credentialsUrl;
+
+    private final String registrationBody;
 
     public Creater(final Config config) throws Exception {
         System.out.format("Running with config: %s%n", config);
@@ -56,6 +43,11 @@ public class Creater implements AutoCloseable {
         this.config = config;
         this.plain = config.isPlainPasswords();
         this.dynamic = config.isDynamicPasswords();
+        this.credentialsPerDevice = config.getCredentialsPerDevice();
+        this.deviceIdPrefix = config.getDeviceIdPrefix();
+
+        this.registrationBody = getRegistrationBody(this.config.getRegistrationExtPayloadSize());
+        this.credentialExtSize = this.config.getCredentialExtPayloadSize();
 
         var builder = new OkHttpClient.Builder();
 
@@ -81,13 +73,9 @@ public class Creater implements AutoCloseable {
                 .addPathSegment(config.getTenantId())
                 .build();
 
-        this.registrationBody = getRegistrationBody();
-        this.credentialExtSize = this.config.getCredentialExtPayloadSize();
-
         System.out.println("Register URL: " + this.registerUrl);
         System.out.println("Credentials URL: " + this.credentialsUrl);
         System.out.println("Device ID example value:" + this.config.getDeviceIdPrefix() + 0);
-        System.out.println("Registration body:" + this.registrationBody);
         System.out.println("Credential Example JSON: " + credentialJson(0));
 
         this.stats = new Statistics(System.out, Duration.ofSeconds(10));
@@ -128,7 +116,7 @@ public class Creater implements AutoCloseable {
                         .newBuilder()
                         .addPathSegment(deviceId)
                         .build())
-                .post(RequestBody.create(this.registrationBody, JSON))
+                .post(RequestBody.create(getRegistrationBody(i), JSON))
                 .build();
 
         try (Response response = this.client.newCall(register).execute()) {
@@ -163,10 +151,6 @@ public class Creater implements AutoCloseable {
 
     }
 
-    private void handleError(final Exception e) {
-        log.warn("Failed to process", e);
-    }
-
     private void handleCredentialsFailure(final Response response) {
         this.stats.errorCredentials();
     }
@@ -180,80 +164,17 @@ public class Creater implements AutoCloseable {
     }
 
     private String credentialJson(long i) {
-        final Map<String, Object> result = new HashMap<>(3);
-        result.put("type", "hashed-password");
-        result.put("auth-id", this.config.getDeviceIdPrefix() + "auth-" + i);
-        result.put("ext", getCredentialExt());
-
-        final Map<String, String> secret = new HashMap<>(2);
-        final String password = "longerThanUsualPassword-" + i;
-        if (this.plain) {
-            secret.put("pwd-plain", password);
-        } else if (!this.dynamic) {
-            secret.put("pwd-hash", "GO/C0ZqOnMFs2QnCUxFR92pu1uPe4fdMgVCXGjnH7uk=");
-            secret.put("salt", "YvajSViCAW8=");
-            secret.put("hash-function", "sha-256");
-        } else {
-            final byte[] salt = new byte[8];
-            R.nextBytes(salt);
-            secret.put("pwd-hash", encodePassword(salt, password));
-            secret.put("hash-function", "sha-256");
-            secret.put("salt", Base64.getEncoder().encodeToString(salt));
-        }
-        result.put("secrets", Collections.singletonList(secret));
-
-        return Exceptions.wrap(() -> this.mapper.writeValueAsString(Collections.singletonList(result)));
+        return Exceptions.wrap(() ->
+                this.mapper.writeValueAsString(standardCredentialJson(i)));
     }
 
-    private static String encodePassword(byte[] salt, final String password) {
-        final MessageDigest digest = Exceptions.wrap(() -> MessageDigest.getInstance("SHA-256"));
-        if (salt != null) {
-            digest.update(salt);
-        }
-        return Base64.getEncoder().encodeToString(digest.digest(password.getBytes(StandardCharsets.UTF_8)));
+    private String getRegistrationBody(long i){
+        return Exceptions.wrap(() ->
+                this.mapper.writeValueAsString(deviceJson(i)));
     }
 
-    private String getRegistrationBody(){
-        final int size = config.getRegistrationExtPayloadSize();
-
-        if (size > 0) {
-            Map<String, Object> root = new HashMap<>();
-            root.put("enabled", "true");
-
-            Map<String, Object> ext = new HashMap<>();
-
-            ext.put("additionalProp1", getRandomString(size));
-            root.put("ext", ext);
-
-            return Exceptions.wrap(() -> mapper.writeValueAsString(root));
-        } else {
-            return "{}";
-        }
-    }
-
-    private Map<String, Object> getCredentialExt(){
-
-        Map<String, Object> root = new HashMap<>();
-
-        if (credentialExtSize > 0) {
-            root.put("additionalProp1", getRandomString(credentialExtSize));
-            return root;
-        } else {
-            return root;
-        }
-    }
-
-    private String getRandomString(final int size){
-        Random random = ThreadLocalRandom.current();
-        final char[] alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
-                .toCharArray();
-
-        StringBuffer out = new StringBuffer(size);
-        for (int i = 0; i < size; i++)
-        {
-            out.append(alphabet[random.nextInt(alphabet.length)]);
-        }
-
-        return out.toString();
+    @Override protected void createDevice(String tenantId, long deviceIndex, String version)
+            throws Exception {
+        // we use a custom run method here.
     }
 }

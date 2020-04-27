@@ -15,6 +15,7 @@
         <module>http-inserter</module>
         <module>http-reader</module>
         <module>infinispan-reporter</module>
+        <module>postgre-inserter</module>
         <module>postgre-reporter</module>
     </modules>
 

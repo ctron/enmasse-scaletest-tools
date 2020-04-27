@@ -9,47 +9,16 @@ import com.google.common.base.MoreObjects;
 
 import io.glutamate.lang.Environment;
 import io.glutamate.lang.Exceptions;
+import net.trystram.scaletest.BaseConfig;
 import okhttp3.HttpUrl;
 
-public class Config {
+public class Config extends BaseConfig {
 
-    private long devicesToCreate = Long.MAX_VALUE;
-    private String deviceIdPrefix;
-
-    private String tenantId;
     private String authToken;
     private HttpUrl registryUrl;
     private boolean insecureTls;
     private boolean onlyRegister;
-    private boolean plainPasswords;
-    private boolean dynamicPasswords;
     private boolean disableConnectionPool;
-    private int registrationExtPayloadSize;
-    private int credentialExtPayloadSize;
-
-    public void setDevicesToCreate(long devicesToCreate) {
-        this.devicesToCreate = devicesToCreate;
-    }
-
-    public long getDevicesToCreate() {
-        return devicesToCreate > 0 ? devicesToCreate : Long.MAX_VALUE;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setDeviceIdPrefix(String deviceIdPrefix) {
-        this.deviceIdPrefix = deviceIdPrefix;
-    }
-
-    public String getDeviceIdPrefix() {
-        return deviceIdPrefix;
-    }
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
@@ -83,40 +52,8 @@ public class Config {
         return onlyRegister;
     }
 
-    public void setPlainPasswords(boolean plainPasswords) {
-        this.plainPasswords = plainPasswords;
-    }
-
-    public boolean isPlainPasswords() {
-        return plainPasswords;
-    }
-
-    public void setDynamicPasswords(boolean dynamicPasswords) {
-        this.dynamicPasswords = dynamicPasswords;
-    }
-
-    public boolean isDynamicPasswords() {
-        return dynamicPasswords;
-    }
-
-    public int getRegistrationExtPayloadSize() {
-        return registrationExtPayloadSize;
-    }
-
-    public void setRegistrationExtPayloadSize(int registrationExtPayloadSize) {
-        this.registrationExtPayloadSize = registrationExtPayloadSize;
-    }
-
     public void setDisableConnectionPool(boolean disableConnectionPool) {
         this.disableConnectionPool = disableConnectionPool;
-    }
-
-    public int getCredentialExtPayloadSize() {
-        return credentialExtPayloadSize;
-    }
-
-    public void setCredentialExtPayloadSize(int credentialExtPayloadSize) {
-        this.credentialExtPayloadSize = credentialExtPayloadSize;
     }
 
     public boolean isDisableConnectionPool() {
@@ -134,7 +71,6 @@ public class Config {
 
         System.out.format("Using authToken: '%s'%n", result.getAuthToken());
 
-        result.setDeviceIdPrefix(Environment.get("DEVICE_ID_PREFIX").orElse(""));
         result.setTenantId(Environment.get("TENANT_ID")
                 .or(() -> {
                     return Environment.get("NAMESPACE")
@@ -159,6 +95,9 @@ public class Config {
                     return builder.build();
                 }));
 
+        result.setDeviceIdPrefix(Environment.get("DEVICE_ID_PREFIX").orElse(""));
+        Environment.consumeAs("CREDENTIALS_PER_DEVICE", Integer::parseInt, result::setCredentialsPerDevice);
+
         Environment.consumeAs("INSECURE_TLS", Boolean::parseBoolean, result::setInsecureTls);
         Environment.consumeAs("ONLY_REGISTER", Boolean::parseBoolean, result::setOnlyRegister);
         Environment.consumeAs("PLAIN_PASSWORDS", Boolean::parseBoolean, result::setPlainPasswords);
@@ -173,7 +112,6 @@ public class Config {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("authToken", this.authToken)
                 .add("deviceIdPrefix", this.deviceIdPrefix)
                 .add("devicesToCreate", this.devicesToCreate)
                 .add("insecureTls", this.insecureTls)
@@ -185,6 +123,7 @@ public class Config {
                 .add("disableConnectionPool", this.disableConnectionPool)
                 .add("registrationExtPayloadSize", this.registrationExtPayloadSize)
                 .add("credentialExtPayloadSize", this.credentialExtPayloadSize)
+                .add("credentialsPerDevice", this.credentialsPerDevice)
                 .toString();
     }
 

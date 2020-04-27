@@ -3,15 +3,15 @@ apiVersion: v1
 metadata:
   name: http-inserter
 spec:
-  triggers: 
+  triggers:
     - type: ImageChange
     - type: ConfigChange
-  source: 
+  source:
     type: Git
     git:
       uri: https://github.com/ctron/enmasse-scaletest-tools
       ref: master
-  strategy: 
+  strategy:
     type: source
     sourceStrategy:
       from:

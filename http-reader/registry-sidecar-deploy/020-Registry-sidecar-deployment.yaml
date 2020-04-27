@@ -1,0 +1,11 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: debug-endpoint-nginx-sidecar
+        image:  nginx
+        ports:
+        - containerPort: 8082
+        volumeMounts:
+        - mountPath: /etc/nginx
+          name: sidecar-nginx-config

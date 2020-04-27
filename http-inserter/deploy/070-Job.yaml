@@ -39,9 +39,11 @@ spec:
             - name: PLAIN_PASSWORDS
               value: "false"
             - name: MAX_DEVICES
-              value: "2000"
+              value: "400000"
             - name: DYNAMIC_PASSWORDS
               value: "true"
+            - name: CREDENTIALS_PER_DEVICE
+              value: "1"
             - name: REGISTRATION_EXT_PAYLOAD_SIZE
               value: "0"
             - name: CREDENTIAL_EXT_PAYLOAD_SIZE
