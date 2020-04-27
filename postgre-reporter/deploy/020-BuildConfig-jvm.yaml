@@ -1,7 +1,7 @@
 kind: BuildConfig
 apiVersion: v1
 metadata:
-  name: postgre-reporter
+  name: postgre-reporter-jvm
 spec:
   triggers:
     - type: ImageChange
@@ -16,11 +16,20 @@ spec:
     sourceStrategy:
       from:
         kind: ImageStreamTag
-        name: quarkus-native-s2i:20.0.0-java11
+        name: java:11
+        namespace: openshift
       env:
       - name: SRC_DIR
         value: /tmp/src/postgre-reporter
+      - name: MAVEN_S2I_ARTIFACT_DIRS
+        value: target
+      - name: S2I_SOURCE_DEPLOYMENTS_FILTER
+        value: "*-runner.jar lib"
+      - name: JAVA_OPTIONS
+        value: -Dquarkus.http.host=0.0.0.0
+      - name: AB_JOLOKIA_OFF
+        value: "true"
   output:
     to:
       kind: ImageStreamTag
-      name: postgre-reporter:latest
+      name: postgre-reporter-jvm:latest

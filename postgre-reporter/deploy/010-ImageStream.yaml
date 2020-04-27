@@ -10,6 +10,14 @@ spec:
 kind: ImageStream
 apiVersion: v1
 metadata:
+ name: postgre-reporter-jvm
+spec:
+  lookupPolicy:
+    local: true
+---
+kind: ImageStream
+apiVersion: v1
+metadata:
  name: quarkus-native-s2i
 spec:
  tags:

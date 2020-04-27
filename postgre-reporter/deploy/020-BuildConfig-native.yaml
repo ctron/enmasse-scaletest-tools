@@ -1,0 +1,26 @@
+kind: BuildConfig
+apiVersion: v1
+metadata:
+  name: postgre-reporter-native
+spec:
+  triggers:
+    - type: ImageChange
+    - type: ConfigChange
+  source:
+    type: Git
+    git:
+      uri: https://github.com/ctron/enmasse-scaletest-tools
+      ref: master
+  strategy:
+    type: source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: quarkus-native-s2i:20.0.0-java11
+      env:
+      - name: SRC_DIR
+        value: /tmp/src/postgre-reporter
+  output:
+    to:
+      kind: ImageStreamTag
+      name: postgre-reporter:latest

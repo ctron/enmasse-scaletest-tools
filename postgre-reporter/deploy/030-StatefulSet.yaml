@@ -33,7 +33,7 @@ spec:
       containers:
       - name: main
         image: postgre-reporter:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
           - name: "quarkus.datasource.url"
             value: "vertx-reactive:postgresql://postgresql.device-registry-storage.svc/device-registry"
