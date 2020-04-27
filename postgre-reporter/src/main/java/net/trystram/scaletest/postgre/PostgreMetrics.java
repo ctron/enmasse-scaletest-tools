@@ -11,9 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import io.vertx.axle.sqlclient.Row;
-import io.vertx.axle.sqlclient.RowSet;
-import io.vertx.axle.sqlclient.Tuple;
+import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.mutiny.sqlclient.RowSet;
 
 @ApplicationScoped
 @RegisterForReflection
@@ -22,7 +21,7 @@ public class PostgreMetrics {
     private static final Logger logger = LoggerFactory.getLogger(PostgreMetrics.class);
 
     @Inject
-    io.vertx.axle.pgclient.PgPool client;
+    io.vertx.mutiny.pgclient.PgPool client;
 
     void onStart(@Observes StartupEvent ev) {
         logger.info("The application is starting...");
@@ -41,9 +40,8 @@ public class PostgreMetrics {
     }
 
     private RowSet<Row> tableSizeQuery(final String table) {
-        return client.preparedQuery("select count(*) from $1", Tuple.of(table))
-                .toCompletableFuture()
-                .whenComplete((r, e) -> logger.info("Complete - error: {}, result: {}", e, r))
-                .join();
+        return client.query("select count(*) from " + table)
+                .await()
+                .indefinitely();
     }
 }
