@@ -9,8 +9,8 @@ spec:
   source:
     type: Git
     git:
-      uri: https://github.com/jbtrystram/enmasse-scaletest-tools
-      ref: postgre-reporter
+      uri: https://github.com/ctron/enmasse-scaletest-tools
+      ref: master
   strategy:
     type: source
     sourceStrategy:
