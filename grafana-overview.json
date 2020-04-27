@@ -696,10 +696,13 @@
           "alias": "per-pod",
           "color": "#8AB8FF",
           "fill": 0,
-          "stack": false,
-          "yaxis": 2
+          "stack": false
         },
-        {}
+        {
+          "alias": "total-entries",
+          "linewidth": 0,
+          "yaxis": 2
+        }
       ],
       "spaceLength": 10,
       "stack": true,
@@ -725,6 +728,13 @@
           "intervalFactor": 1,
           "legendFormat": "per-pod",
           "refId": "C"
+        },
+        {
+          "expr": "sum(write_success)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "total-entries",
+          "refId": "D"
         }
       ],
       "thresholds": [],
@@ -755,7 +765,7 @@
           "show": true
         },
         {
-          "format": "none",
+          "format": "locale",
           "label": "",
           "logBase": 1,
           "max": null,
@@ -976,5 +986,5 @@
   "timezone": "",
   "title": "Overview",
   "uid": "ZypDlOaZz",
-  "version": 6
+  "version": 2
 }
