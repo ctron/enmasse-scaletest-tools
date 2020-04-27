@@ -1,0 +1,39 @@
+kind: IoTConfig
+apiVersion: iot.enmasse.io/v1alpha1
+metadata:
+  name: default
+spec:
+  services:
+    deviceConnection:
+      jdbc:
+        server:
+          external:
+            username: registry
+            password: user12
+            url: jdbc:postgresql://postgresql.device-registry-storage.svc/device-registry
+    deviceRegistry:
+      jdbc:
+        server:
+          external:
+            mode: JSON_TREE
+            management:
+              connection:
+                username: registry
+                password: user12
+                url: jdbc:postgresql://postgresql.device-registry-storage.svc/device-registry
+  adapters:
+    mqtt:
+      enabled: false
+    http:
+      enabled: true
+      replicas: 1
+      containers:
+        adapter:
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: 500m
+    lorawan:
+      enabled: false
+    sigfox:
+      enabled: false
