@@ -3,6 +3,9 @@ apiVersion: iot.enmasse.io/v1alpha1
 metadata:
   name: default
 spec:
+  imageOverrides:
+    iot-device-registry-jdbc:
+      name: iot-device-registry-jdbc-debug:latest
   services:
     deviceConnection:
       jdbc:

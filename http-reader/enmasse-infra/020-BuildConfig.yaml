@@ -1,0 +1,19 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: iot-device-registry-jdbc-debug
+spec:
+  triggers: 
+    - type: ImageChange
+  source:
+    type: Dockerfile
+    dockerfile: |
+      FROM quay.io/ctronenmassetesting/iot-device-registry-jdbc:latest
+      ENV ENMASSE_IOT_REGISTRY_DEBUG_ENABLED=true
+      ENV ENMASSE_IOT_REGISTRY_DEBUG_PORT=44120
+  strategy: 
+    dockerStrategy: {}
+  output: 
+    to:
+      kind: ImageStreamTag
+      name: iot-device-registry-jdbc-debug:latest

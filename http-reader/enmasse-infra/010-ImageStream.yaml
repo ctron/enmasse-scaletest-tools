@@ -1,7 +1,7 @@
 kind: ImageStream
 apiVersion: v1
 metadata:
- name: http-reader
+  name: iot-device-registry-jdbc-debug
 spec:
   lookupPolicy:
     local: true

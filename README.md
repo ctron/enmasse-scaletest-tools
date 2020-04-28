@@ -9,9 +9,8 @@
 Each test is conducted in it's own namespace.
 
 Create a new namespace.
-```
-oc new-project test-1
-```
+
+    oc new-project test-1
 
 Make sure to reset the database between each test:
 

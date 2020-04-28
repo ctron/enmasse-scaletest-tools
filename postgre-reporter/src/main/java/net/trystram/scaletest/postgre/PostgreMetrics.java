@@ -29,19 +29,30 @@ public class PostgreMetrics {
     }
 
     @Gauge(name = "table_entries", tags = {"table=devices"}, unit = MetricUnits.NONE, description = "Total number of entries in the 'devices' table")
-    public Long tableEntries() {
-
-        long count = -1;
-        for(Row row : tableSizeQuery("devices")){
-            logger.info("Row: {}", row);
-            count = row.getLong("count");
-        }
-        return count;
+    public Long tableDevicesEntries() {
+        return tableSizeQuery("devices");
     }
 
-    private RowSet<Row> tableSizeQuery(final String table) {
-        return client.query("select count(*) from " + table)
+    @Gauge(name = "table_entries", tags = {"table=device_registrations"}, unit = MetricUnits.NONE, description = "Total number of entries in the 'device_registrations' table")
+    public Long tableDeviceRegistrationsEntries() {
+        return tableSizeQuery("device_registrations");
+    }
+
+    @Gauge(name = "table_entries", tags = {"table=device_credentials"}, unit = MetricUnits.NONE, description = "Total number of entries in the 'device_credentials' table")
+    public Long tableDeviceCredentialsEntries() {
+        return tableSizeQuery("device_credentials");
+    }
+
+    private long tableSizeQuery(final String table) {
+         final RowSet<Row> rows = client.query("select count(*) from " + table)
                 .await()
                 .indefinitely();
+
+        for(Row row : rows){
+            logger.info("Row: {}", row);
+            return row.getLong("count");
+        }
+
+        return -1;
     }
 }

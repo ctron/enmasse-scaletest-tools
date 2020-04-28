@@ -1,30 +1,22 @@
 ## 1 - Enable debug endpoint in the device registry
 
-Add the correct environment variables then rebuild the device registry image.
-Exemple of values to add in `<enmasse-source>/iot/iot-device-registry-jdbc/Dockerfile` :
+Add the correct environment variables then rebuild the device registry image. Execute
+the following command from this directory:
 
-```
-ENV ENMASSE_IOT_REGISTRY_DEBUG_ENABLED=true
-ENV ENMASSE_IOT_REGISTRY_DEBUG_PORT=44120
-```
+    oc -n enmasse-infra apply -f enmasse-infra
+    oc -n enmasse-infra start-build iot-device-registry-jdbc-debug
+    #oc -n enmasse-infra patch iotconfig default -p "$(cat patches/patch-iotconfig.yaml)"
 
 ## 2 - Deploy the sidecar to expose the device registry debug endpoint
 
-Create the configamp
-```
-oc apply -f registry-sidecar-deploy/010-Registry-sidecar-configmp.yaml
-```
+Add the configmap as a volume to the device registry pod:
 
-Add the configmap as a volume to the device registry pod 
-```
-oc set volumes -n enmasse-infra deployment iot-device-registry --add --name=sidecar-nginx-config -t configmap --configmap-name=iot-device-registry-debug-endpoint-sidecar-nginx-config
-```
+    oc -n enmasse-infra set volumes deployment iot-device-registry --add --name=sidecar-nginx-config -t configmap --configmap-name=iot-device-registry-debug-endpoint-sidecar-nginx-config
 
-Add the nginx sidecar container in the deployment :
-```
-oc patch -n enmasse-infra deployment iot-device-registry -p "$(cat registry-sidecar-deploy/020-Registry-sidecar-deployment.yaml)"
-```
+Add the nginx sidecar container in the deployment:
 
-## 3 - Run the test ! 
+    oc -n enmasse-infra patch deployment iot-device-registry -p "$(cat patches/patch-registry-sidecar.yaml)"
+
+## 3 - Run the test!
 
 See the [other readme](../README.md).

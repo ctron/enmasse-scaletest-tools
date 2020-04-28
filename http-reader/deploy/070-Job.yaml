@@ -23,9 +23,9 @@ spec:
             - name: IOT_PROJECT
               value: iot
             - name: MAX_DEVICES_CREATED
-              value: "400000"
-            - name: DEVICES_TO_READ
-              value: "1000000"
+              value: "300000"
+#            - name: DEVICES_TO_READ
+#              value: "1000000"
             - name: NAMESPACE
               valueFrom:
                 fieldRef:

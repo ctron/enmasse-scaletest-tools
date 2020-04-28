@@ -1,28 +1,28 @@
 package net.trystram.scaletest.httpReader;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.glutamate.lang.Exceptions;
-import io.prometheus.client.Gauge;
-import net.trystram.scaletest.Tls;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Duration;
 import java.time.Instant;
-
 import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.glutamate.lang.Exceptions;
+import io.prometheus.client.Gauge;
+import net.trystram.scaletest.Tls;
 import okhttp3.ConnectionPool;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Reader implements AutoCloseable {
 
@@ -96,7 +96,6 @@ public class Reader implements AutoCloseable {
     }
 
     public void run() {
-
         long max = config.getDevicesToRead();
         for (long i = 0; i < max; i++) {
             try {
