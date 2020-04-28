@@ -777,7 +777,7 @@
           "expr": "application_net_trystram_scaletest_postgre_PostgreMetrics_table_entries",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "total-entries",
+          "legendFormat": "total-entries.{{table}}",
           "refId": "D"
         }
       ],
@@ -1030,5 +1030,5 @@
   "timezone": "",
   "title": "Overview",
   "uid": "ZypDlOaZz",
-  "version": 4
+  "version": 5
 }
