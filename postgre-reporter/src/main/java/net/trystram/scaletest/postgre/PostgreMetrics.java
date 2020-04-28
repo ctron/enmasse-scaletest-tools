@@ -18,6 +18,8 @@ import io.vertx.mutiny.sqlclient.RowSet;
 @RegisterForReflection
 public class PostgreMetrics {
 
+    private static final String DESC= "Total number of entries in a table";
+
     private static final Logger logger = LoggerFactory.getLogger(PostgreMetrics.class);
 
     @Inject
@@ -28,17 +30,17 @@ public class PostgreMetrics {
         logger.info("Client: {}", this.client);
     }
 
-    @Gauge(name = "table_entries", tags = {"table=devices"}, unit = MetricUnits.NONE, description = "Total number of entries in the 'devices' table")
+    @Gauge(name = "table_entries", tags = {"table=devices"}, unit = MetricUnits.NONE, description = DESC)
     public Long tableDevicesEntries() {
         return tableSizeQuery("devices");
     }
 
-    @Gauge(name = "table_entries", tags = {"table=device_registrations"}, unit = MetricUnits.NONE, description = "Total number of entries in the 'device_registrations' table")
+    @Gauge(name = "table_entries", tags = {"table=device_registrations"}, unit = MetricUnits.NONE, description = DESC)
     public Long tableDeviceRegistrationsEntries() {
         return tableSizeQuery("device_registrations");
     }
 
-    @Gauge(name = "table_entries", tags = {"table=device_credentials"}, unit = MetricUnits.NONE, description = "Total number of entries in the 'device_credentials' table")
+    @Gauge(name = "table_entries", tags = {"table=device_credentials"}, unit = MetricUnits.NONE, description = DESC)
     public Long tableDeviceCredentialsEntries() {
         return tableSizeQuery("device_credentials");
     }
