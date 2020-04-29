@@ -322,7 +322,23 @@
       "valueName": "current"
     },
     {
-      "content": "",
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorPrefix": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "format": "locale",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
       "gridPos": {
         "h": 3,
         "w": 4,
@@ -330,14 +346,63 @@
         "y": 3
       },
       "id": 10,
+      "interval": null,
       "links": [],
-      "mode": "markdown",
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
       "options": {},
+      "postfix": " op/s",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": true
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "sum(irate(read_success[1m]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
-      "transparent": true,
-      "type": "text"
+      "title": "Success Rate",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "current"
     },
     {
       "aliasColors": {},
@@ -407,6 +472,14 @@
           "intervalFactor": 1,
           "legendFormat": "inserters",
           "refId": "C"
+        },
+        {
+          "expr": "sum(up{job_name=\"http-reader\"})",
+          "format": "time_series",
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "inserters",
+          "refId": "D"
         }
       ],
       "thresholds": [],
@@ -680,7 +753,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "application_net_trystram_scaletest_postgre_PostgreMetrics_table_entries",
+          "expr": "sum(application_net_trystram_scaletest_postgre_PostgreMetrics_table_entries)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "devices",
@@ -743,7 +816,7 @@
           "stack": false
         },
         {
-          "alias": "total-entries",
+          "alias": "/total-entries.*/",
           "linewidth": 0,
           "yaxis": 2
         }
@@ -1030,5 +1103,5 @@
   "timezone": "",
   "title": "Overview",
   "uid": "ZypDlOaZz",
-  "version": 5
+  "version": 2
 }
