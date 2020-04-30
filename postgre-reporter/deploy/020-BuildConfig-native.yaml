@@ -1,7 +1,8 @@
+---
 kind: BuildConfig
 apiVersion: v1
 metadata:
-  name: postgre-reporter-native
+  name: postgre-reporter-native-build
 spec:
   triggers:
     - type: ImageChange
@@ -23,4 +24,36 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: postgre-reporter:latest
+      name: postgre-reporter-native-build:latest
+---
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: postgre-reporter-native
+spec:
+  triggers: 
+    - type: ImageChange
+  source:
+    type: Dockerfile
+    dockerfile: |
+      FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
+      COPY application /application
+      CMD /application
+      EXPOSE 8080
+    images:
+    - as: null
+      from:
+        kind: ImageStreamTag
+        name: postgre-reporter-native-build:latest
+      paths:
+      - destinationDir: .
+        sourcePath: /home/quarkus/application
+  strategy: 
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: ubi-minimal:latest
+  output: 
+    to:
+      kind: ImageStreamTag
+      name: postgre-reporter-native:latest

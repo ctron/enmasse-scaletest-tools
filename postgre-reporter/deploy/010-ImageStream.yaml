@@ -2,7 +2,15 @@
 kind: ImageStream
 apiVersion: v1
 metadata:
- name: postgre-reporter
+ name: postgre-reporter-native-build
+spec:
+  lookupPolicy:
+    local: true
+---
+kind: ImageStream
+apiVersion: v1
+metadata:
+ name: postgre-reporter-native
 spec:
   lookupPolicy:
     local: true
@@ -25,5 +33,18 @@ spec:
    from:
      kind: DockerImage
      name: quay.io/quarkus/ubi-quarkus-native-s2i:20.0.0-java11
+   importPolicy:
+     scheduled: true
+---
+kind: ImageStream
+apiVersion: v1
+metadata:
+ name: ubi-minimal
+spec:
+ tags:
+ - name: "latest"
+   from:
+     kind: DockerImage
+     name: registry.access.redhat.com/ubi8/ubi-minimal:latest
    importPolicy:
      scheduled: true
