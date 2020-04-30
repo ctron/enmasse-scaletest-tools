@@ -78,3 +78,7 @@ Delete the prometheus metrics to reset the data in the grafana dahsboard:
 ### Enter Postgres Database
 
     oc -n device-registry-storage rsh dc/postgresql bash -c "PGPASSWORD=user12 psql -h postgresql device-registry registry"
+
+### Adding more compute power
+
+    oc -n openshift-machine-api scale machineset --all --replicas=2
