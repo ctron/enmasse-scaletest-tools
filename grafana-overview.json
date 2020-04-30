@@ -75,6 +75,10 @@
           "alias": "errors.device",
           "color": "#C4162A",
           "stack": "A"
+        },
+        {
+          "alias": "per-pod",
+          "stack": false
         }
       ],
       "spaceLength": 10,
@@ -82,32 +86,39 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (type) ( irate(read_error[1m]))",
+          "expr": "sum by (type) (rate(read_error[1m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "errors.{{type}}",
           "refId": "B"
         },
         {
-          "expr": "sum(irate(read_success[1m]))",
+          "expr": "sum(rate(read_success[1m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "success",
           "refId": "A"
         },
         {
-          "expr": "sum(irate(read_devices_latency_ms_sum[1m])) / sum(irate(read_devices_latency_ms_count[1m]))",
+          "expr": "sum(rate(read_devices_latency_ms_sum[1m])) / sum(rate(read_devices_latency_ms_count[1m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "avg-device",
           "refId": "C"
         },
         {
-          "expr": "sum(irate(read_credentials_latency_ms_sum[1m])) / sum(irate(read_credentials_latency_ms_count[1m]))",
+          "expr": "sum(rate(read_credentials_latency_ms_sum[1m])) / sum(rate(read_credentials_latency_ms_count[1m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "avg-credentials",
           "refId": "D"
+        },
+        {
+          "expr": "sum(rate(read_success[1m])) / sum(up{job_name=\"http-reader\"})",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "per-pod",
+          "refId": "E"
         }
       ],
       "thresholds": [],
@@ -142,7 +153,7 @@
           "format": "ms",
           "label": null,
           "logBase": 1,
-          "max": null,
+          "max": "25",
           "min": "0",
           "show": true
         }
@@ -819,6 +830,14 @@
           "alias": "/total-entries.*/",
           "linewidth": 0,
           "yaxis": 2
+        },
+        {
+          "alias": "success",
+          "color": "#56A64B"
+        },
+        {
+          "alias": "/errors.*/",
+          "color": "#E02F44"
         }
       ],
       "spaceLength": 10,
@@ -826,21 +845,21 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(irate(write_success[1m]))",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "success",
-          "refId": "A"
-        },
-        {
-          "expr": "sum by (type) ( irate(write_error[1m]))",
+          "expr": "sum by (type) (rate(write_error[1m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "errors.{{type}}",
           "refId": "B"
         },
         {
-          "expr": "sum(irate(write_success[1m])) / sum(up{job_name=\"http-inserter\"})",
+          "expr": "sum(rate(write_success[1m]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "success",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(write_success[1m])) / sum(up{job_name=\"http-inserter\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "per-pod",
@@ -1103,5 +1122,5 @@
   "timezone": "",
   "title": "Overview",
   "uid": "ZypDlOaZz",
-  "version": 2
+  "version": 3
 }
