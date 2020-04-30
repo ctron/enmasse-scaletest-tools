@@ -6,14 +6,14 @@ data:
   nginx.conf: |
     
     user  nginx;
-    worker_processes  1;
+    worker_processes  4;
 
     error_log  /dev/stdout info;
     pid        /tmp/nginx.pid;
 
 
     events {
-        worker_connections  1024;
+        worker_connections  2048;
     }
 
     stream { 
