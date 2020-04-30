@@ -38,6 +38,8 @@ spec:
               value: "false"
             - name: TEST_PSK
               value: "false"
+            - name: DISABLE_CONNECTION_POOL
+              value: "true"
           ports:
             - name: metrics
               containerPort: 8081
